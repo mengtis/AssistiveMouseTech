@@ -43,17 +43,23 @@ class HandTracker():
         conts = self.handSeg.get_objects(color_frame)
 
         # Iterate over all contours and check if they are a hand
-        for i, cont in enumerate(conts):
+        for cont in conts:
             contArea = cv2.contourArea(cont)
             hull = cv2.convexHull(cont, returnPoints = False)
             defects = cv2.convexityDefects(cont, hull)
+
+            # a contour with no convexity defects cannot be an outstretched
+            # hand, and OpenCV returns None rather than an empty array
+            if defects is None:
+                continue
+
             out_count = 0
             for i in range(defects.shape[0]):
                 s,e,f,d = defects[i,0]
                 far = tuple(cont[f][0]) #farthest point on contour from the line
                 if d > self.dist_threshold:
                     out_count += 1
-                
+
                 cv2.circle(color_frame,far,5,[0,0,255],-1)
 
             # found the hand: initialise the tracker
