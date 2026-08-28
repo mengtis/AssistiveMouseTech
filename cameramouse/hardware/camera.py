@@ -6,7 +6,6 @@ Date Created: 28 Nov 2018
 
 import numpy as np
 import cv2
-import pyrealsense2 as rs
 
 
 class CameraObject():
@@ -45,6 +44,16 @@ class WebcamCamera(CameraObject):
 class RealSenseCamera(CameraObject):
     def __init__(self, color=True, depth=False):
         super().__init__()
+        # imported here rather than at module scope so that webcam users, who are
+        # the common case, don't need pyrealsense2 installed to run the mouse
+        try:
+            import pyrealsense2 as rs
+        except ImportError:
+            raise ImportError(
+                "pyrealsense2 is required for RealSenseCamera but is not installed. "
+                "Install it with 'pip install pyrealsense2', or select the webcam "
+                "camera in config.yaml to run without a RealSense device."
+            )
         self.pipeline = rs.pipeline()
         self.config = rs.config()
         if depth:
