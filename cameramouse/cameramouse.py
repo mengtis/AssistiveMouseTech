@@ -39,21 +39,24 @@ class CameraMouse():
 
             # if the hand is lost, recalibrate and locate the hand
             if not self.tracker.found:
-                initial_pos = self.tracker.calibrate(frame)
+                initial_pos = self.tracker.global_recognition(color_frame)
                 if initial_pos is not None:
                     self.control.setup(initial_pos)
-    
+
             # hand is still in view, track it
             else:
                 centroid = self.tracker.update_position(color_frame, self.opts["control"]["type"])
-                cur_gesture = self.gesture_recognition.update()
+
+                # the recognisers publish the current gesture on .gesture rather
+                # than returning it; the keyboard one is driven by a key hook
+                cur_gesture = self.gesture_recognition.gesture
 
                 # Make sure we aren't doubling down on the same action
                 if self.last_gesture_update < self.gesture_recognition.i:
                     self.last_gesture_update = self.gesture_recognition.i
                 elif self.last_gesture_update == self.gesture_recognition.i and not (cur_gesture == Gestures.drag):
                     cur_gesture = Gestures.null
-                
+
                 self.control.update(centroid)
                 self.control.execute(cur_gesture)
 
