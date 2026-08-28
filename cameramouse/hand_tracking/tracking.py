@@ -166,8 +166,10 @@ class HandTracker():
             corners: the corner locations for the box [top_left_x, top_left_y, bottom_right_x, bottom_right_y]
         """
         # set corners to be prev bounding box
-        corners = np.zeros((4), dtype=int)
-        corners = self.prev_hand.rectangle
+        # NOTE: must be a copy - the transforms below are in-place, and
+        # prev_hand.rectangle is shared with hand.rectangle via the shallow
+        # copy in update_position()
+        corners = self.prev_hand.rectangle.copy()
 
         # transform to corner locations
         corners[2] = corners[0] + corners[2]
