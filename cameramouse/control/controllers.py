@@ -29,8 +29,11 @@ class Control():
         """
         Setup needs to be done to fill the positions buffer
         """
-        self.filter.positions[:, 0] *= point[0]
-        self.filter.positions[:, 1] *= point[1]
+        # assign rather than multiply: the buffer only holds ones on the first
+        # call, so multiplying compounded old positions into it whenever the
+        # hand was lost and re-acquired
+        self.filter.positions[:, 0] = point[0]
+        self.filter.positions[:, 1] = point[1]
         self.previous["timestamp"] = time.time()
         self.previous["position"] = point
 
