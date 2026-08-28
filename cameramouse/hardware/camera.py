@@ -31,7 +31,8 @@ class WebcamCamera(CameraObject):
         super().__init__()
         self.cam = cv2.VideoCapture(src)
         frame = self.capture_color_frame()
-        self.width, self.height, _ = frame.shape
+        # numpy orders axes (rows, columns, channels), i.e. (height, width, _)
+        self.height, self.width, _ = frame.shape
         self.im_shape = (self.width, self.height)
         print("[DEBUG] Image Resolution: Width {}, Height {}".format(self.width, self.height))
         print("[DEBUG] Initialised Webcam")
