@@ -1,0 +1,62 @@
+# Core runtime for the OpenCV camera mouse (cameramouse/).
+#
+#   python3 -m pip install -r requirements.txt
+#   cd cameramouse && python3 main.py
+#
+# This is the cross-platform pipeline and needs nothing but a webcam.
+# For the gesture-learning / model-training stack see requirements-ml.txt.
+#
+# Tested on Python 3.9. Lower bounds are the oldest versions known to work;
+# upper bounds are only applied where a major release is known to break the
+# code, so that this file does not rot the way the pinned versions in the
+# original README did.
+
+# Computer vision. The contour-extraction call in hand_tracking/tracking.py
+# handles both the OpenCV 3 and OpenCV 4 findContours signatures, but 4.x is
+# what this is developed and benchmarked against.
+opencv-python>=4.5,<5.0
+
+# numpy is capped below 2.0: the 2.0 ABI break affects the joblib-pickled
+# gesture models in gesture_learning/, and lifting the cap needs those
+# models regenerated and re-validated first.
+numpy>=1.19,<2.0
+
+# config.yaml parsing in cameramouse/main.py
+PyYAML>=5.3
+
+# Cursor actuation and monitor geometry off Windows.
+# hardware/mouse.py and hardware/monitor.py try pywin32 first and fall back
+# to these two, so they are required on any non-Windows host.
+pyautogui>=0.9.48
+
+# WARNING - macOS is currently NOT supported, and this line is why.
+# The 'mouse' package ships Windows and Linux backends only; on Darwin it
+# raises OSError("Unsupported platform 'Darwin'") at import time. Because
+# hardware/monitor.py and hardware/mouse.py import it unconditionally in
+# their non-Windows fallback branch, neither module can be imported on a
+# Mac, so cameramouse/main.py cannot start there at all.
+#
+# The marker below keeps 'pip install -r requirements.txt' succeeding on
+# macOS, but it does not make the code run: the fallback branch needs to
+# use pyautogui, which is already a dependency and does support Darwin.
+# Tracked as a follow-up fix.
+mouse>=0.7.1; sys_platform != "darwin"
+
+# Key-press gesture input (gesture_recognition/keyboard.py).
+# NOTE: this package reads global input events. On Linux it must be run as
+# root, and on macOS the terminal needs Accessibility and Input Monitoring
+# permission under System Settings > Privacy & Security.
+keyboard>=0.13.4
+
+# --- Windows only -----------------------------------------------------------
+# hardware/mouse.py and hardware/monitor.py prefer the win32 API when it is
+# importable. The environment marker means pip skips this off Windows.
+pywin32>=228; sys_platform == "win32"
+
+# --- Optional hardware ------------------------------------------------------
+# Intel RealSense depth camera support (hardware/camera.py RealSenseCamera).
+# Deliberately NOT a hard requirement: the import is deferred into
+# RealSenseCamera.__init__ so that webcam users, the common case, do not need
+# the RealSense SDK. Install it only if you have the hardware:
+#
+#   python3 -m pip install pyrealsense2

@@ -1,0 +1,36 @@
+# Gesture-learning / model-training stack (gesture_learning/).
+#
+#   python3 -m pip install -r requirements-ml.txt
+#
+# Only needed to retrain or evaluate the gesture classifiers. The camera
+# mouse itself runs without any of this -- see requirements.txt.
+#
+# Installing this file alone is enough; it pulls in the core runtime so that
+# GestureRecognition.py, which runs a trained model alongside the tracker,
+# has everything it needs.
+
+-r requirements.txt
+
+# Classical models: KMeans, Gaussian Mixture, Random Forest (learn.py)
+scikit-learn>=0.22
+joblib>=0.14
+
+# Dataset parsing and feature tables (keypoints.py, learn.py)
+pandas>=1.0
+
+# Training curves, t-SNE embeddings and the gesture PDFs (learn.py, DLNN.py)
+matplotlib>=3.1
+seaborn>=0.10
+
+# The DNN baseline in DLNN.py and the model loader in GestureRecognition.py.
+# The code uses Keras 2-era imports ("from keras.models import Sequential"),
+# which Keras 3 still accepts. tensorflow supplies the backend.
+tensorflow>=2.8
+keras>=2.8
+
+# --- Not required by gesture_learning ---------------------------------------
+# scipy is used only by mouse-control-test/point_filter.py, and
+# mouse-control-test/main.py imports pymouse (PyUserInput), which has been
+# unmaintained since 2016 and does not install on modern Python. Those two
+# scripts are superseded by cameramouse/ and are left out of this file
+# deliberately rather than by oversight.

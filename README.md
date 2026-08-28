@@ -58,8 +58,8 @@ Most gesture-control projects pick one tracking backend and inherit its limitati
 | Tracking method | 21-point hand landmark model | HSV colour segmentation + motion tracking |
 | Gesture vocabulary | Rich — full hand geometry | Limited — position and coarse shape |
 | Throughput | Lower; GPU/CPU intensive | **Full 30 FPS** on commodity CPU |
-| Portability | Linux only (Bazel toolchain) | **Windows, macOS, Linux** |
-| Setup burden | Build from source | `pip install`, run |
+| Portability | Linux only (Bazel toolchain) | **Windows and Linux** (macOS blocked, see below) |
+| Setup burden | Build from source | `pip install -r requirements.txt`, run |
 | Best for | Expressive multi-gesture control | Low-power machines, broad deployment |
 
 Building both is the point: the MediaPipe path proves the ceiling of what gesture control can express, and the OpenCV path proves it can ship to a user on a five-year-old laptop today.
@@ -140,16 +140,27 @@ The OpenCV tracker (`cameramouse/hand_tracking/tracking.py`) maintains hand posi
 
 ## Quick start
 
-### OpenCV pipeline (recommended first run — Windows / macOS / Linux)
+### OpenCV pipeline (recommended first run — Windows / Linux)
 
 ```bash
-pip3 install keyboard==0.13.4 numpy==1.16.5 matplotlib==3.1.1 \
-             opencv-python pyyaml==5.3.1 argparse \
-             pyrealsense2==2.29.0.1124 mouse==0.7.1 pyautogui==0.9.48
+python3 -m pip install -r requirements.txt
 
 cd cameramouse
 python3 main.py
 ```
+
+> **macOS is not currently supported.** `hardware/monitor.py` and
+> `hardware/mouse.py` fall back to the `mouse` package off Windows, and that
+> package ships Windows and Linux backends only — on Darwin it raises
+> `OSError: Unsupported platform 'Darwin'` at import time, so `main.py` cannot
+> start. `pip install` itself succeeds (the dependency is marked
+> `sys_platform != "darwin"`); it is the import that fails. Routing the
+> fallback through `pyautogui`, already a dependency and Darwin-capable, is
+> the open fix.
+
+Retraining the gesture models additionally needs `requirements-ml.txt`. An
+Intel RealSense camera needs `pip install pyrealsense2`; it is deliberately
+not a core dependency, so a webcam-only setup does not pay for it.
 
 Place your hand in the green square, press `z` to calibrate to your skin tone, then outstretch your hand to be detected. Move your hand to move the cursor. `o` toggles out-of-range, `d` starts/stops dragging, `s` single-clicks. Edit `config.yaml` to select the segmentation and control strategy. Full detail: [`cameramouse/README.md`](cameramouse/README.md).
 
