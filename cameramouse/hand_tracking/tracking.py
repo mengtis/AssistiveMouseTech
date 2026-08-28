@@ -1,5 +1,5 @@
 import numpy as np
-import time, argparse, cv2, sys, copy, yaml
+import time, cv2, copy
 import hand_tracking.colour_segmentation as colour_segmentation
 
 class HandTracker():
@@ -16,7 +16,7 @@ class HandTracker():
         self.expansion_const = 50 # how much to expand ROI in prediction step
 
         # Initialise the size of the frame
-        gray, color = camera.capture_frames()
+        color = camera.capture_color_frame()
         self.y_bound, self.x_bound, _ = color.shape
         self.centre = (self.x_bound // 2, self.y_bound // 2)
 
@@ -105,8 +105,7 @@ class HandTracker():
             self.found = 0
 
         else: # multiple objects - get largest
-            maxI = np.where(areas == np.amax(areas))[0]
-            maxI = maxI[0]
+            maxI = np.argmax(areas)
             rect_area = areas[maxI]
             cont = conts[maxI]
 

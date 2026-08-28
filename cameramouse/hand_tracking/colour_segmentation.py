@@ -1,4 +1,4 @@
-import cv2, yaml
+import cv2
 import numpy as np
 import time
 
@@ -31,7 +31,7 @@ class HandSegmetation():
         self.numRectangles = numRectangles
         self.testMorphology = testMorphology
         self.camera = camera # needed for the segmentation to calibrate
-        _, self.color_frame = self.camera.capture_frames()
+        self.color_frame = self.camera.capture_color_frame()
 
         # create a rectangle to sample skin colour from
         self.sample_rect_size = 100
@@ -40,6 +40,7 @@ class HandSegmetation():
 
         self.morphElement = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (8, 16))
         self.denoiseElement = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
+        self.discElement = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
         self.dilationIterations = 4
         self.erosionIterations = 2
         self.colorThresh = 50
@@ -58,7 +59,7 @@ class HandSegmetation():
         hand_hist_created = False
         while hand_hist_created == False:
             pressed_key = cv2.waitKey(1)
-            gray_frame, self.color_frame = self.camera.capture_frames()
+            self.color_frame = self.camera.capture_color_frame()
             self.blur = cv2.GaussianBlur(self.color_frame, self.blurKernel, 0)
             cv2.rectangle(self.color_frame, self.sample_rectangle[0], self.sample_rectangle[1], (0, 255, 0), 1)
 
@@ -116,8 +117,7 @@ class HandSegmetation():
         hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
         dst = cv2.calcBackProject([hsv], [0, 1], self.hand_hist, [0, 180, 0, 256], 1)
 
-        disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
-        cv2.filter2D(dst, -1, disc, dst)
+        cv2.filter2D(dst, -1, self.discElement, dst)
         _, thresh = cv2.threshold(dst,self.colorThresh,255,cv2.THRESH_BINARY)
         erosion = cv2.erode(thresh, self.denoiseElement, iterations = self.erosionIterations)
         dilation = cv2.dilate(erosion, self.morphElement, iterations = self.dilationIterations)

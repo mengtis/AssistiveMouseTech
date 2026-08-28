@@ -30,7 +30,7 @@ recalibrated = False
 
 while True:
     # grab frames
-    gray_frame, color_frame = camera.capture_frames()
+    color_frame = camera.capture_color_frame()
 
     if not hand_tracker.found: # hand is lost
         if not recalibrated:

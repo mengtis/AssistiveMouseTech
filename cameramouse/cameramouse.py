@@ -35,7 +35,7 @@ class CameraMouse():
 
         while True:
             # grab frames
-            gray_frame, color_frame = self.camera.capture_frames()
+            color_frame = self.camera.capture_color_frame()
 
             # if the hand is lost, recalibrate and locate the hand
             if not self.tracker.found:
@@ -78,7 +78,7 @@ class HandSegmentationMouse(CameraMouse):
         while True:
 
             # grab frames
-            gray_frame, color_frame = self.camera.capture_frames()
+            color_frame = self.camera.capture_color_frame()
 
             # if the hand is lost, recalibrate and locate the hand
             if not self.tracker.found:
