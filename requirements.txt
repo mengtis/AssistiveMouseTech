@@ -29,17 +29,12 @@ PyYAML>=5.3
 # to these two, so they are required on any non-Windows host.
 pyautogui>=0.9.48
 
-# WARNING - macOS is currently NOT supported, and this line is why.
+# Cursor actuation on Linux (hardware/mouse.py LinuxMouse).
 # The 'mouse' package ships Windows and Linux backends only; on Darwin it
-# raises OSError("Unsupported platform 'Darwin'") at import time. Because
-# hardware/monitor.py and hardware/mouse.py import it unconditionally in
-# their non-Windows fallback branch, neither module can be imported on a
-# Mac, so cameramouse/main.py cannot start there at all.
-#
-# The marker below keeps 'pip install -r requirements.txt' succeeding on
-# macOS, but it does not make the code run: the fallback branch needs to
-# use pyautogui, which is already a dependency and does support Darwin.
-# Tracked as a follow-up fix.
+# raises OSError("Unsupported platform 'Darwin'") at import time, so the
+# marker below keeps it off macOS installs. macOS is served by MacMouse,
+# which drives the cursor through pyautogui above; set os: mac in
+# cameramouse/config.yaml to select it.
 mouse>=0.7.1; sys_platform != "darwin"
 
 # Key-press gesture input (gesture_recognition/keyboard.py).
