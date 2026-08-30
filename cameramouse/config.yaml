@@ -2,8 +2,8 @@
 gesture: 
   type: keyboard # options none, keyboard
 
-# OS you are using - Linux and Windows supported
-os: windows # options linux, windows
+# OS you are using - Linux, Windows and Mac supported
+os: windows # options linux, windows, mac
 
 # Camera params
 camera: 

@@ -22,26 +22,32 @@ from hand_tracking import tracking, colour_segmentation
 
 class Loader():
     def load_monitor(os):
-        if os not in ["linux", "windows"]:
-            raise ValueError('Only Windows and Linux Supported')
-        
+        if os not in ["linux", "windows", "mac"]:
+            raise ValueError('Only Windows, Linux and Mac Supported')
+
         if os == "linux":
             print("[DEBUG] Loading Linux Monitor")
             return monitor.LinuxMonitor()
         elif os == "windows":
             print("[DEBUG] Loading Windows Monitor")
             return monitor.WindowsMonitor()
+        elif os == "mac":
+            print("[DEBUG] Loading Mac Monitor")
+            return monitor.MacMonitor()
 
     def load_mouse(os):
-        if os not in ["linux", "windows"]:
-            raise ValueError('Only Windows and Linux Supported Currently')
-        
+        if os not in ["linux", "windows", "mac"]:
+            raise ValueError('Only Windows, Linux and Mac Supported Currently')
+
         if os == "linux":
             print("[DEBUG] Loading Linux Mouse")
             return mouse.LinuxMouse()
         elif os == "windows":
             print("[DEBUG] Loading Windows Mouse")
             return mouse.WindowsMouse()
+        elif os == "mac":
+            print("[DEBUG] Loading Mac Mouse")
+            return mouse.MacMouse()
 
     def load_camera(opts):
         camera_type = opts["type"]

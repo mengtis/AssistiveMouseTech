@@ -58,7 +58,7 @@ Most gesture-control projects pick one tracking backend and inherit its limitati
 | Tracking method | 21-point hand landmark model | HSV colour segmentation + motion tracking |
 | Gesture vocabulary | Rich — full hand geometry | Limited — position and coarse shape |
 | Throughput | Lower; GPU/CPU intensive | **Full 30 FPS** on commodity CPU |
-| Portability | Linux only (Bazel toolchain) | **Windows and Linux** (macOS blocked, see below) |
+| Portability | Linux only (Bazel toolchain) | **Windows, macOS, Linux** |
 | Setup burden | Build from source | `pip install -r requirements.txt`, run |
 | Best for | Expressive multi-gesture control | Low-power machines, broad deployment |
 
@@ -140,7 +140,7 @@ The OpenCV tracker (`cameramouse/hand_tracking/tracking.py`) maintains hand posi
 
 ## Quick start
 
-### OpenCV pipeline (recommended first run — Windows / Linux)
+### OpenCV pipeline (recommended first run — Windows / macOS / Linux)
 
 ```bash
 python3 -m pip install -r requirements.txt
@@ -149,14 +149,16 @@ cd cameramouse
 python3 main.py
 ```
 
-> **macOS is not currently supported.** `hardware/monitor.py` and
-> `hardware/mouse.py` fall back to the `mouse` package off Windows, and that
-> package ships Windows and Linux backends only — on Darwin it raises
-> `OSError: Unsupported platform 'Darwin'` at import time, so `main.py` cannot
-> start. `pip install` itself succeeds (the dependency is marked
-> `sys_platform != "darwin"`); it is the import that fails. Routing the
-> fallback through `pyautogui`, already a dependency and Darwin-capable, is
-> the open fix.
+Set `os:` in `config.yaml` to `windows`, `linux`, or `mac` to select the cursor
+backend. Windows uses the win32 API via `pywin32`, Linux uses the `mouse`
+package, and macOS uses `pyautogui` — the `mouse` package has no Darwin
+backend, which is why the macOS path is separate.
+
+> **macOS permissions:** grant the terminal running this both Accessibility
+> and Input Monitoring under System Settings → Privacy & Security, or the OS
+> silently discards the cursor and key events. Note also that `pyautogui`'s
+> failsafe is left enabled, so driving the cursor into a screen corner raises
+> `FailSafeException` and stops the program by design.
 
 Retraining the gesture models additionally needs `requirements-ml.txt`. An
 Intel RealSense camera needs `pip install pyrealsense2`; it is deliberately
